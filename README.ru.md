@@ -1,6 +1,6 @@
 # mercurius-mcp-client
 
-[English](README.md) | **Русский**
+[English](README.md) | **Русский** | [中文](README.cn.md)
 
 Асинхронный клиент Model Context Protocol (MCP) для AMPHP: JSON-RPC 2.0 по Streamable HTTP (ответ JSON или события
 server-sent events), список инструментов и ресурсы постранично, вызов инструмента с файлами результата.

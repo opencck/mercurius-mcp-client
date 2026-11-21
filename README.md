@@ -1,6 +1,6 @@
 # mercurius-mcp-client
 
-**English** | [Русский](README.ru.md)
+**English** | [Русский](README.ru.md) | [中文](README.cn.md)
 
 An asynchronous Model Context Protocol (MCP) client for AMPHP: JSON-RPC 2.0 over Streamable HTTP (a JSON answer or
 server-sent events), the tool list and resources by pages, a tool call with the files of its result.
