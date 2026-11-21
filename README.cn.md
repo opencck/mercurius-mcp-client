@@ -2,6 +2,8 @@
 
 [English](README.md) | [Русский](README.ru.md) | **中文**
 
+> 本文由模型翻译，尚未经人工审校；如有出入，以英文版为准。
+
 面向 AMPHP 的异步 Model Context Protocol (MCP) 客户端：基于 Streamable HTTP 的 JSON-RPC 2.0（JSON 应答或服务器发送事件），分页获取工具列表和资源，调用工具并取回其结果中的文件。
 
 属于 [Mercurius](https://github.com/opencck/mercurius)——一个自主的个人智能体。该软件包不依赖 Mercurius 应用，可以单独使用。
