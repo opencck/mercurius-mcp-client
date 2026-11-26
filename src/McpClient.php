@@ -20,8 +20,9 @@ interface McpClient {
 
     /**
      * @param array<string, mixed> $arguments
-     * @return array{0: string, 1: bool, 2?: list<array{name: string, type: string, bytes: string}>} the text of the result,
-     *         whether the server reports an error, and the files it returned (embedded resources, images, audio)
+     * @return array{0: string, 1: bool, 2?: list<array{name: string, type: string, bytes: string}>, 3?: array<array-key, mixed>|null}
+     *         the text of the result, whether the server reports an error, the files it returned (embedded resources,
+     *         images, audio) and its structured content
      * @throws RuntimeException
      */
     public function call(McpEndpoint $server, #[SensitiveParameter] ?string $token, string $tool, array $arguments, Cancellation $cancellation): array;

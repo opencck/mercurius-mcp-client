@@ -57,9 +57,10 @@ abstract class McpRpcClient implements McpClient {
     /**
      * The text of a tool result, whether it is an error, and the files in it: an embedded resource with a blob, an
      * image or audio with data. A binary part is not text for a model; the caller keeps it as a file.
+     * The structured content of the result comes apart as well, for a caller that reads fields rather than text.
      *
      * @param array<array-key, mixed> $result
-     * @return array{0: string, 1: bool, 2: list<array{name: string, type: string, bytes: string}>}
+     * @return array{0: string, 1: bool, 2: list<array{name: string, type: string, bytes: string}>, 3: array<array-key, mixed>|null}
      */
     public function content(array $result): array {
         $texts = [];
@@ -87,7 +88,8 @@ abstract class McpRpcClient implements McpClient {
             $json = json_encode($result['structuredContent'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $texts[] = $json === false ? '' : $json;
         }
-        return [implode("\n", $texts), ($result['isError'] ?? false) === true, $files];
+        $structured = isset($result['structuredContent']) && is_array($result['structuredContent']) ? $result['structuredContent'] : null;
+        return [implode("\n", $texts), ($result['isError'] ?? false) === true, $files, $structured];
     }
 
     /**

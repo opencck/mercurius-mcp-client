@@ -74,6 +74,16 @@ final class HttpMcpClientTest extends AsyncTestCase {
         self::assertSame('hi', $files[1]['bytes'] ?? null);
     }
 
+    public function testACallGivesItsStructuredContentApart(): void {
+        $http = new McpHttpFake([200, ['content-type' => 'application/json'], '[{"jsonrpc":"2.0","id":1,"result":{}},{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"text","text":"exit 0"}],"structuredContent":{"exit":0,"stdout":"a\n"}}}]']);
+        $client = new HttpMcpClient(new HttpClient($http, []), new McpTexts());
+
+        $answer = $client->call(self::endpoint(), null, 'run', [], new NullCancellation());
+
+        self::assertSame('exit 0', $answer[0], 'the text stays the text');
+        self::assertSame(['exit' => 0, 'stdout' => "a\n"], $answer[3] ?? null);
+    }
+
     public function testResourcesAreReadAndBinaryPartsNamed(): void {
         $http = new McpHttpFake([200, ['content-type' => 'text/event-stream'], self::events([
             '{"jsonrpc":"2.0","id":1,"result":{}}',
