@@ -27,8 +27,13 @@ final class ModelsContract {
     public const UNITS = ['call', 'second', 'mtok_in', 'mtok_out'];
 
     private const MODELS_MAX = 200;
-    private const TOOL = '~^[A-Za-z0-9_.-]{1,64}$~';
-    private const ID = '~^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$~';
+    private const TOOL = '~^[A-Za-z0-9_.-]{1,64}\z~';
+    /** a name, then one optional part after a slash (which may hold colons): what a category of the agent can hold */
+    private const ID = '~^[A-Za-z0-9][A-Za-z0-9._-]{0,63}(?:/[A-Za-z0-9._:-]{1,63})?\z~';
+    /** above this a price of one call or one million tokens is not a real one */
+    private const MAX_USD = 1000.0;
+    /** the widest window a model can claim */
+    private const MAX_CONTEXT = 10_000_000;
 
     /**
      * The name of the catalog tool when the server declares the contract in a version this client knows; null — an
@@ -103,15 +108,17 @@ final class ModelsContract {
         /** @var mixed $priceRow */
         $priceRow = $row['price'] ?? null;
         if (is_array($priceRow) && is_string($priceRow['unit'] ?? null) && in_array($priceRow['unit'], self::UNITS, true)
-            && (is_int($priceRow['usd'] ?? null) || is_float($priceRow['usd'] ?? null)) && $priceRow['usd'] >= 0) {
+            && (is_int($priceRow['usd'] ?? null) || is_float($priceRow['usd'] ?? null)) && is_finite((float) $priceRow['usd'])
+            && $priceRow['usd'] >= 0 && $priceRow['usd'] <= self::MAX_USD) {
             $price = ['unit' => $priceRow['unit'], 'usd' => (float) $priceRow['usd']];
         }
         /** @var mixed $titleRaw */
         $titleRaw = $row['title'] ?? null;
-        $title = is_string($titleRaw) ? mb_substr(trim($titleRaw), 0, 120) : '';
+        // the title goes into the list of models: no control, format or private characters
+        $title = is_string($titleRaw) ? mb_substr(trim((string) preg_replace('/\p{C}+/u', ' ', $titleRaw)), 0, 120) : '';
         /** @var mixed $context */
         $context = $row['context'] ?? null;
-        $window = is_int($context) && $context > 0 ? $context : null;
+        $window = is_int($context) && $context > 0 && $context <= self::MAX_CONTEXT ? $context : null;
         return new McpModel($id, $kind, $tool, $result, array_keys($input) ?: ['text'], ($row['default'] ?? false) === true, $title, $price, $window);
     }
 }

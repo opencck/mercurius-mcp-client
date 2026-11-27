@@ -52,6 +52,23 @@ final class ModelsContractTest extends AsyncTestCase {
         self::assertSame([], ModelsContract::models(['models' => 'no'], $tools));
     }
 
+    public function testWhatAServerClaimsIsHeldToTheGrammarAndToSaneNumbers(): void {
+        $models = ModelsContract::models(['models' => [
+            ['id' => "line\n", 'kind' => 'image', 'tool' => 'image'],
+            ['id' => 'veo:fast', 'kind' => 'image', 'tool' => 'image'],
+            ['id' => 'a/b/c', 'kind' => 'image', 'tool' => 'image'],
+            ['id' => 'family/veo:fast', 'kind' => 'image', 'tool' => 'image'],
+            ['id' => 'inf', 'kind' => 'image', 'tool' => 'image', 'price' => ['unit' => 'call', 'usd' => INF]],
+            ['id' => 'huge', 'kind' => 'image', 'tool' => 'image', 'price' => ['unit' => 'call', 'usd' => 5000.0], 'context' => PHP_INT_MAX],
+        ]], ['image', "image\n"]);
+
+        self::assertSame(['family/veo:fast', 'inf', 'huge'], array_map(static fn(McpModel $m): string => $m->id, $models), 'the ids a category of the agent can hold');
+        self::assertNull($models[1]->price, 'an endless price is no price');
+        self::assertNull($models[2]->price, 'nor one above any real call');
+        self::assertNull($models[2]->context);
+        self::assertNull(ModelsContract::catalogTool(['experimental' => [ModelsContract::KEY => ['version' => 1, 'catalog' => "models_list\n"]]]));
+    }
+
     public function testTheCapabilitiesOfAServerAreKeptFromItsStart(): void {
         $http = new McpHttpFake([200, ['content-type' => 'application/json'], '{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{},"experimental":{"mercurius.models":{"version":1}}}}}']);
         $client = new HttpMcpClient(new HttpClient($http, []));

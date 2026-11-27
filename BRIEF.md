@@ -32,7 +32,7 @@
 | `src/McpRpcClient.php` | Абстрактный клиент: методы MCP, постраничные списки, разбор `content` и `structuredContent`, файлы результата. Транспорт даёт два метода: `session` и `rpc` |
 | `src/HttpMcpClient.php` | Транспорт Streamable HTTP: сессия на одно использование (`initialize`, `notifications/initialized`, затем запрос), разбор JSON и событий SSE (`messages`), сопоставление ответа по `id` |
 | `src/McpServerInfo.php` | Что сервер сказал о себе в начале сессии: `capabilities` из ответа `initialize`. `McpRpcClient` хранит их по серверу (`started()` вызывает транспорт) |
-| `src/Models/ModelsContract.php`, `src/Models/McpModel.php` | Договор «сервер предлагает модели» поверх обычного MCP: объявление в `experimental["mercurius.models"]` (версия 1, инструмент каталога), разбор каталога — модель на вид, только с инструментом, который у сервера есть. Подробно — [Провайдеры моделей от MCP](../../brief/skills-mcp.md#провайдеры-моделей-от-mcp) |
+| `src/Models/ModelsContract.php`, `src/Models/McpModel.php` | Договор «сервер предлагает модели» поверх обычного MCP: объявление в `experimental["mercurius.models"]` (версия 1, инструмент каталога), разбор каталога — модель на вид, только с инструментом, который у сервера есть; id, цена, окно и название держатся границ (каталог — недоверенные данные). Подробно — [Провайдеры моделей от MCP](../../brief/skills-mcp.md#провайдеры-моделей-от-mcp) |
 | `src/McpTexts.php` | Тексты результатов и ошибок; по умолчанию английские |
 | `test/HttpMcpClientTest.php` | Тесты на подменном `HttpClient`: события в одной сессии, вызов с ошибкой и файлами, ресурсы, тексты неудач, разбор JSON и SSE |
 
