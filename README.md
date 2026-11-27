@@ -35,6 +35,14 @@ $tools = $client->tools(new Server(), $token, new NullCancellation());
 The texts the client puts into results and errors are English; pass `new McpTexts(...)` with your own to the
 constructor. A failure is a `RuntimeException` with such a text.
 
+## Models offered by a server
+
+A server may offer models on top of plain MCP, with nothing of its own on the wire: it declares
+`capabilities.experimental["mercurius.models"] = {"version": 1, "catalog": "models_list"}` in its answer to
+`initialize` and lists its models with that tool. `serverCapabilities()` (interface `McpServerInfo`) gives what the
+server said at the start of its session; `Models\ModelsContract::catalogTool()` reads the declaration and
+`ModelsContract::models()` the catalog. A server without the declaration is an ordinary one.
+
 ## Checks
 
 `composer check` — PHPUnit, PHPStan (level max) and Psalm (level 1).

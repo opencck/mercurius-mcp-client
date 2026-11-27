@@ -12,9 +12,12 @@ use SensitiveParameter;
  * The MCP methods over any JSON-RPC transport: the list of tools (by pages), a call, resources and reading one. A
  * transport gives a session and one request in it; HTTP and stdio differ only there.
  */
-abstract class McpRpcClient implements McpClient {
+abstract class McpRpcClient implements McpClient, McpServerInfo {
     public const PROTOCOL = '2025-06-18';
     private const PAGES = 10;
+
+    /** @var array<string, array<array-key, mixed>> the capabilities each server named at the start of its session */
+    private array $capabilities = [];
 
     public function __construct(
         protected readonly McpTexts $texts = new McpTexts(),
@@ -31,6 +34,25 @@ abstract class McpRpcClient implements McpClient {
      * @throws RuntimeException the server answered with an error or did not answer
      */
     abstract protected function rpc(McpEndpoint $server, #[SensitiveParameter] ?string $token, object|string|null $session, string $method, array $params, Cancellation $cancellation): array;
+
+    public function serverCapabilities(McpEndpoint $server, #[SensitiveParameter] ?string $token, Cancellation $cancellation): array {
+        $this->session($server, $token, $cancellation);
+        return $this->capabilities[self::keyOf($server)] ?? [];
+    }
+
+    /**
+     * Keeps what the server answered to `initialize`; a transport calls it when a session begins.
+     *
+     * @param array<array-key, mixed> $result
+     */
+    protected function started(McpEndpoint $server, array $result): void {
+        $this->capabilities[self::keyOf($server)] = isset($result['capabilities']) && is_array($result['capabilities']) ? $result['capabilities'] : [];
+    }
+
+    private static function keyOf(McpEndpoint $server): string {
+        return $server->endpointName() . "
+" . $server->endpointUrl();
+    }
 
     public function tools(McpEndpoint $server, #[SensitiveParameter] ?string $token, Cancellation $cancellation): array {
         $tools = [];

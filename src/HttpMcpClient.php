@@ -22,12 +22,13 @@ final class HttpMcpClient extends McpRpcClient {
     }
 
     protected function session(McpEndpoint $server, #[SensitiveParameter] ?string $token, Cancellation $cancellation): ?string {
-        [, $session] = $this->send($server, $token, null, [
+        [$started, $session] = $this->send($server, $token, null, [
             'jsonrpc' => '2.0',
             'id' => 1,
             'method' => 'initialize',
             'params' => $this->initializeParams(),
         ], $cancellation);
+        $this->started($server, isset($started['result']) && is_array($started['result']) ? $started['result'] : []);
         $this->send($server, $token, $session, ['jsonrpc' => '2.0', 'method' => 'notifications/initialized'], $cancellation);
         return $session;
     }

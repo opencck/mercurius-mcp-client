@@ -34,6 +34,13 @@ $tools = $client->tools(new Server(), $token, new NullCancellation());
 
 客户端放入结果和错误中的文本为英文；可向构造函数传入带有你自己文本的 `new McpTexts(...)`。失败表现为带有此类文本的 `RuntimeException`。
 
+## 服务器提供的模型
+
+服务器可以在普通 MCP 之上提供模型，通信中不增加任何自有内容：它在对 `initialize` 的应答中声明
+`capabilities.experimental["mercurius.models"] = {"version": 1, "catalog": "models_list"}`，并用该工具列出模型。
+`serverCapabilities()`（接口 `McpServerInfo`）给出服务器在会话开始时所说的内容；`Models\ModelsContract::catalogTool()`
+读取声明，`ModelsContract::models()` 读取目录。没有声明的服务器就是普通服务器。
+
 ## 检查
 
 `composer check` —— PHPUnit、PHPStan（level max）和 Psalm（level 1）。

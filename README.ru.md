@@ -35,6 +35,14 @@ $tools = $client->tools(new Server(), $token, new NullCancellation());
 Тексты, которые клиент кладёт в результаты и ошибки, — на английском; свои передаются в конструктор как
 `new McpTexts(...)`. Неудача — `RuntimeException` с таким текстом.
 
+## Модели, которые предлагает сервер
+
+Сервер может предлагать модели поверх обычного MCP, ничего своего не добавляя в обмен: он объявляет
+`capabilities.experimental["mercurius.models"] = {"version": 1, "catalog": "models_list"}` в ответе на `initialize`
+и отдаёт список моделей этим инструментом. `serverCapabilities()` (интерфейс `McpServerInfo`) даёт то, что сервер
+сказал в начале сессии; `Models\ModelsContract::catalogTool()` читает объявление, `ModelsContract::models()` —
+каталог. Сервер без объявления — обычный.
+
 ## Проверки
 
 `composer check` — PHPUnit, PHPStan (уровень max) и Psalm (уровень 1).
